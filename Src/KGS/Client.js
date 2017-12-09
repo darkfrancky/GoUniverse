@@ -648,7 +648,7 @@ CKGSClient.prototype.SendCreateChallenge = function(nChannelId, nCallBackKey, nG
 		oRules["byoYomiTime"]   = oTimeSettings.GetOverTime();
 		oRules["byoYomiStones"] = oTimeSettings.GetOverCount();
 	}
-	
+
 	var arrPlayers = [{"role" : "white", "name" : this.m_oCurrentUser.GetName()}, {"role" : "black"}];
 	if (EKGSGameType.Rengo === nGameType)
 		arrPlayers.push({"role" : "black_2"}, {"role" : "white_2"});
@@ -720,29 +720,29 @@ CKGSClient.prototype.SendCreateDemonstration = function(nChannelId, nCallBackKey
 CKGSClient.prototype.SendSubmitChallenge = function(nChannelId, nGameType, oRules, bNigiri, bCreatorBlack, sCreator, bPrivate)
 {
 	var arrPlayers = [{
-			"role" : bCreatorBlack ? "black" : "white",
-			"name" : sCreator
-		}, {
-			"role" : bCreatorBlack ? "white" : "black",
-			"name" : this.GetUserName()
-		}];
-		
+		"role" : bCreatorBlack ? "black" : "white",
+		"name" : sCreator
+	}, {
+		"role" : bCreatorBlack ? "white" : "black",
+		"name" : this.GetUserName()
+	}];
+
 	if (EKGSGameType.Rengo === nGameType)
 	{
 		arrPlayers = [{
-			"role" : "white", 
+			"role" : "white",
 			"name" : sCreator
-			}, {
-				"role" : "black",
-				"name" : this.GetUserName()
-			}, {
-				"role" : "black_2"
-			}, {
-				"role" : "white_2"
-			}];
+		}, {
+			"role" : "black",
+			"name" : this.GetUserName()
+		}, {
+			"role" : "black_2"
+		}, {
+			"role" : "white_2"
+		}];
 	}
 
-	
+
 	this.private_SendMessage({
 		"channelId" : nChannelId,
 		"type"      : "CHALLENGE_SUBMIT",
@@ -1145,6 +1145,10 @@ CKGSClient.prototype.private_HandleMessage = function(oMessage)
 	{
 		this.private_HandleConvoNoSuchUser(oMessage);
 	}
+	else if ("MESSAGES" === oMessage.type)
+	{
+		this.private_HandleMessages(oMessage);
+	}
 	else
 	{
 		console.log(oMessage);
@@ -1372,7 +1376,7 @@ CKGSClient.prototype.private_HandleGameRecord = function(oGameRecord, bAdd)
 
 		nGameType = oProposal.GetGameType();
 		bDemo = false;
-		
+
 		var nBoardSize = oProposal.GetBoardSize();
 
 		var oCreator = oGameRecord.GetChallengeCreator();
@@ -1413,7 +1417,7 @@ CKGSClient.prototype.private_HandleGameRecord = function(oGameRecord, bAdd)
 		sGameType = "D";
 		sComment  = "";
 		bDemo     = true;
-		
+
 		if (oOwner)
 		{
 			sWhite  = oOwner.GetName();
@@ -1822,7 +1826,7 @@ CKGSClient.prototype.private_HandleConvoJoin = function(oMessage)
 	};
 
 	this.m_oPrivateChatsByUserName[sUserName] = this.m_oPrivateChats[nChannelId];
-	
+
 	this.m_oApp.AddChatRoom(nChannelId, sUserName, true);
 
 	this.private_AddUserToRoom(this.private_GetCurrentUser(), this.m_oPrivateChats[nChannelId]);
@@ -1943,7 +1947,7 @@ CKGSClient.prototype.private_HandleDetailsNonExistant = function(oMessage)
 		if (oUser.Window)
 			oUser.Window.Close();
 	}
-	
+
 	CreateKGSWindow(EKGSWindowType.Information, {Client : this, App : this.m_oApp, Caption : g_oLocalization.common.window.captionError, Text : g_oLocalization.common.window.messageNoUserWithName(oMessage.name), Image : "WarningSpanWarning", W : 347, H : 144});
 };
 CKGSClient.prototype.private_HandleArchiveNonExistant = function(oMessage)
@@ -2268,6 +2272,35 @@ CKGSClient.prototype.private_HandleAutoMatchStatus = function(oMessage)
 		this.m_oApp.OnCancelAutomatch();
 	}
 };
+
+CKGSClient.prototype.private_HandleMessages = function(oMessage)
+{
+	var nChannelId = -1;
+	var sUserName  = "Messages";
+
+	this.m_oPrivateChats[nChannelId] = {
+		ChannelId       : nChannelId,
+		Name            : sUserName,
+		Users           : {},
+		Disabled        : false
+	};
+
+	this.m_oPrivateChatsByUserName[sUserName] = this.m_oPrivateChats[nChannelId];
+
+	this.m_oApp.AddChatRoom(nChannelId, sUserName, true);
+
+	this.private_AddUserToRoom(this.private_GetCurrentUser(), this.m_oPrivateChats[nChannelId]);
+
+	for (var id in oMessage.messages)
+	{
+		var message = oMessage.messages[id];
+
+		var oUser = this.private_HandleUserRecord(message.user, false);
+		var date = new Date(message.time);
+		this.private_AddUserToRoom(oUser, this.m_oPrivateChats[nChannelId]);
+		this.m_oApp.OnAddTimedChatMessage(date, nChannelId, oUser.GetName(), message.text);
+	}
+};
 CKGSClient.prototype.private_HandleLoginFailedKeepOut = function(oMessage)
 {
 	if (true === this.m_bLoggedIn)
@@ -2288,6 +2321,7 @@ CKGSClient.prototype.private_HandleConvoNoSuchUser = function(oMessage)
 		H      : 144
 	});
 };
+
 CKGSClient.prototype.private_AddUserToRoom = function(oUser, oRoom)
 {
 	if (!oRoom.Users[oUser.GetName()])

@@ -476,6 +476,10 @@ CGoUniverseApplication.prototype.AddConsoleMessage = function(sField, sText)
 CGoUniverseApplication.prototype.OnAddChatMessage = function(nChatRoomId, sUserName, sText, oPr)
 {
 	var oTime = new Date();
+	this.OnAddTimedChatMessage(oTime, nChatRoomId, sUserName, sText, oPr);
+};
+CGoUniverseApplication.prototype.OnAddTimedChatMessage = function(oTime, nChatRoomId, sUserName, sText, oPr)
+{
 	var sTime = "[" + (oTime.getHours() < 10 ? "0" + oTime.getHours() : oTime.getHours()) + ":" + (oTime.getMinutes() < 10 ? "0" + oTime.getMinutes() : oTime.getMinutes()) + "]";
 
 	var oThis = this;
