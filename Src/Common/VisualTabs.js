@@ -594,6 +594,7 @@ function CVisualChatRoomTab(oApp)
 	this.m_oTabDiv = null;
 
 	this.m_bPrivateChat      = false;
+	this.m_bMessageChat		 = false;
 	this.m_bSound            = false;
 	this.m_sRoomName         = "";
 	this.m_oMenuSoundButton  = null;
@@ -602,11 +603,12 @@ function CVisualChatRoomTab(oApp)
 	this.m_oMessagesDiv      = null;
 	this.m_oPopup            = null;
 }
-CVisualChatRoomTab.prototype.Init = function(nId, sRoomName, bPrivate)
+CVisualChatRoomTab.prototype.Init = function(nId, sRoomName, bPrivate, bMessage)
 {
 	this.m_nId               = nId;
 	this.m_nNewMessagesCount = 0;
 	this.m_bPrivateChat      = bPrivate;
+	this.m_bMessageChat		 = bMessage;
 	this.m_sRoomName         = sRoomName;
 	this.m_bSound            = (true === bPrivate ? true : false);
 
@@ -791,7 +793,13 @@ CVisualChatRoomTab.prototype.private_InitTab = function(sRoomName)
 	var NewTabDiv = document.createElement("div");
 	NewTabDiv.style.textAlign = "left";
 	var oCaptionDiv = document.createElement("div");
-	if (true === this.m_bPrivateChat)
+
+	if(true == this.m_bMessageChat)
+	{
+		oCaptionDiv.style.fontWeight = "bold";
+		oCaptionDiv.style.fontStyle = "italic";
+	}
+	else if (true === this.m_bPrivateChat)
 	{
 		oCaptionDiv.style.fontWeight = "bold";
 	}

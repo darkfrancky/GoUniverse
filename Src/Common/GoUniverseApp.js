@@ -381,10 +381,10 @@ CGoUniverseApplication.prototype.GetGamesListView = function()
 {
 	return this.m_oGamesListView;
 };
-CGoUniverseApplication.prototype.AddChatRoom = function(nChatRoomId, sRoomName, bPrivate)
+CGoUniverseApplication.prototype.AddChatRoom = function(nChatRoomId, sRoomName, bPrivate, bMessage)
 {
 	var oTab = new CVisualChatRoomTab(this);
-	oTab.Init(nChatRoomId, sRoomName, bPrivate);
+	oTab.Init(nChatRoomId, sRoomName, bPrivate, bMessage);
 	this.m_oChatRoomTabs.AddTab(oTab);
 	this.m_oChatTabsPanel.OnAddChatRoom();
 };

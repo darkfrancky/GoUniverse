@@ -42,6 +42,8 @@ function CKGSClient(oApp)
 	this.m_oLoadingGames   = {};
 	this.m_nLoadingCounter = 0;
 
+	this.m_oMessages	           = {};
+
 	this.m_oPrivateChats           = {};
 	this.m_oPrivateChatsByUserName = {};
 
@@ -82,6 +84,8 @@ CKGSClient.prototype.Clear = function()
 	this.m_oRoomCategory  = {};
 	this.m_oUserInfo      = {};
 	this.m_oCurrentUser   = new CKGSUser(this);
+
+	this.m_oMessages	           = {};
 
 	this.m_oPrivateChats           = {};
 	this.m_oPrivateChatsByUserName = {};
@@ -179,6 +183,11 @@ CKGSClient.prototype.EnterChatRoom = function(nChatRoomId)
 };
 CKGSClient.prototype.LeaveChatRoom = function(nChatRoomId)
 {
+	if (this.m_oMessages[nChatRoomId])
+	{
+		delete this.m_oMessages[nChatRoomId];
+	}
+
 	if (this.m_oPrivateChats[nChatRoomId])
 	{
 		var sName = this.m_oPrivateChats[nChatRoomId].Name;
@@ -2278,18 +2287,16 @@ CKGSClient.prototype.private_HandleMessages = function(oMessage)
 	var nChannelId = -1;
 	var sUserName  = "Messages";
 
-	this.m_oPrivateChats[nChannelId] = {
+	this.m_oMessages[nChannelId] = {
 		ChannelId       : nChannelId,
 		Name            : sUserName,
 		Users           : {},
 		Disabled        : false
 	};
 
-	this.m_oPrivateChatsByUserName[sUserName] = this.m_oPrivateChats[nChannelId];
+	this.m_oApp.AddChatRoom(nChannelId, sUserName, true, true);
 
-	this.m_oApp.AddChatRoom(nChannelId, sUserName, true);
-
-	this.private_AddUserToRoom(this.private_GetCurrentUser(), this.m_oPrivateChats[nChannelId]);
+	this.private_AddUserToRoom(this.private_GetCurrentUser(), this.m_oMessages[nChannelId]);
 
 	for (var id in oMessage.messages)
 	{
@@ -2297,7 +2304,6 @@ CKGSClient.prototype.private_HandleMessages = function(oMessage)
 
 		var oUser = this.private_HandleUserRecord(message.user, false);
 		var date = new Date(message.time);
-		this.private_AddUserToRoom(oUser, this.m_oPrivateChats[nChannelId]);
 		this.m_oApp.OnAddTimedChatMessage(date, nChannelId, oUser.GetName(), message.text);
 	}
 };
