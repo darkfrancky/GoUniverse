@@ -885,7 +885,7 @@ CKGSClient.prototype.private_SendMessage = function(oMessage)
 				if (oMessage.type == "LOGIN")
 				{
 					oThis.m_bLoggedIn = false;
-					oThis.m_oApp.Logout("Server is unavaliable. Try again later.");
+					oThis.m_oApp.Logout("Server is unavailable. Try again later.");
 				}
 			}
 		}
