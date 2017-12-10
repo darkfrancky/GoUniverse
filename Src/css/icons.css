@@ -1,0 +1,20 @@
+.close:before {
+    /*content : '\274C';*/
+    content : '\2715';
+}
+
+.info:before {
+    content : '\003f';
+}
+
+.leftArrow:before {
+    content : '\21F1';
+}
+
+.sound:before {
+    content : '\260E';
+}
+
+.sound.off:before {
+    content : '\260F';
+}

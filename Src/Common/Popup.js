@@ -26,19 +26,10 @@ CVisualPopup.prototype.Create = function(bDestroyOnHide)
 	if (undefined !== bDestroyOnHide)
 		this.m_bDestroyOnHide = bDestroyOnHide;
 
-	var oMainDiv = this.m_oApp.GetMainDiv();
+	var oContainer = document.getElementById("activeTab");
 
 	var oElement              = document.createElement("div");
-	oElement.style.position   = "absolute";
-	oElement.style.top        = "100px";
-	oElement.style.left       = "100px";
-	oElement.style.width      = "100px";
-	oElement.style.height     = "100px";
-	oElement.style.background = "rgb(243, 243, 243)";
-	oElement.style.display    = "block";
-	oElement.style.overflow   = "hidden";
-	oMainDiv.appendChild(oElement);
-	oElement.style.display    = "none";
+	oContainer.appendChild(oElement);
 
 	this.m_oHtmlElement  = oElement;
 	this.m_nShowId       = null;
@@ -50,7 +41,7 @@ CVisualPopup.prototype.GetHtmlElement = function()
 };
 CVisualPopup.prototype.Toggle = function()
 {
-	if ("none" === this.m_oHtmlElement.style.display)
+	if (!this.m_oHtmlElement.classList.contains("visible"))
 	{
 		this.Show(false);
 	}
@@ -66,10 +57,7 @@ CVisualPopup.prototype.Show = function(bFast)
 
 	if (null === this.m_nShowId)
 	{
-		if (oHandler.UpdatePopupPosition)
-			oHandler.UpdatePopupPosition(oThis);
-
-		if (true === bFast)
+		if (bFast === true)
 		{
 			if (null !== oThis.m_nTransitionId)
 			{
@@ -77,10 +65,7 @@ CVisualPopup.prototype.Show = function(bFast)
 				oThis.m_nTransitionId = null;
 			}
 
-			oThis.m_oHtmlElement.style.display = "block";
-
-			if (oHandler.OnPreShowPopup)
-				oHandler.OnPreShowPopup(oThis);
+			oThis.m_oHtmlElement.classList.add("visible");
 
 			if (oHandler.OnShowPopup)
 				oHandler.OnShowPopup(oThis);
@@ -98,10 +83,7 @@ CVisualPopup.prototype.Show = function(bFast)
 					oThis.m_nTransitionId = null;
 				}
 
-				oThis.m_oHtmlElement.style.display = "block";
-
-				if (oHandler.OnPreShowPopup)
-					oHandler.OnPreShowPopup(oThis);
+				oThis.m_oHtmlElement.classList.add("visible");
 
 				oThis.m_nTransitionId = setTimeout(function()
 				{
@@ -119,16 +101,16 @@ CVisualPopup.prototype.Hide = function(bFast)
 {
 	var oThis    = this;
 	var oHandler = this.m_oHandler;
-	if ("none" !== this.m_oHtmlElement.style.display)
+	if (this.m_oHtmlElement.classList.contains("visible"))
 	{
 		if (oHandler.OnHidePopup)
 			oHandler.OnHidePopup(oThis);
 
-		if (true === bFast)
+		if (bFast)
 		{
-			this.m_oHtmlElement.style.display = "none";
+			this.m_oHtmlElement.classList.remove("visible");
 
-			if (true === this.m_bDestroyOnHide)
+			if (this.m_bDestroyOnHide)
 				this.Destroy();
 		}
 		else
@@ -147,10 +129,10 @@ CVisualPopup.prototype.Hide = function(bFast)
 
 			this.m_nTransitionId = setTimeout(function()
 			{
-				if (true === oThis.m_bDestroyOnHide)
+				if (oThis.m_bDestroyOnHide)
 					oThis.Destroy();
-
-				oThis.m_oHtmlElement.style.display = "none";
+				else
+					this.m_oHtmlElement.classList.remove("visible");
 				oThis.m_nTransitionId              = null;
 			}, 200);
 		}
@@ -161,8 +143,7 @@ CVisualPopup.prototype.Destroy = function()
 	try
 	{
 		this.m_oApp.UnregisterPopup(this);
-		var oMainDiv = this.m_oApp.GetMainDiv();
-		oMainDiv.removeChild(this.m_oHtmlElement);
+		this.m_oHtmlElement.parentNode.removeChild(this.m_oHtmlElement);
 	}
 	catch(e)
 	{
@@ -170,7 +151,7 @@ CVisualPopup.prototype.Destroy = function()
 };
 CVisualPopup.prototype.IsVisible = function()
 {
-	return (this.m_oHtmlElement.style.display === "block" ? true : false);
+	return this.m_oHtmlElement.classList.contains("visible");
 };
 
 function CVisualContextMenu(oApp, nX, nY)
@@ -183,13 +164,8 @@ function CVisualContextMenu(oApp, nX, nY)
 	this.m_oPopup.Create(true);
 
 
-	var oHtmlElement            = this.m_oPopup.GetHtmlElement();
-	oHtmlElement.style.zIndex   = 0xFFFFFFFF;
-	oHtmlElement.style.position = "absolute";
-	oHtmlElement.style.top      = "100px";
-	oHtmlElement.style.left     = "100px";
-	oHtmlElement.style.display  = "none";
-	oHtmlElement.className += "ContextMenu";
+	var oHtmlElement = this.m_oPopup.GetHtmlElement();
+	oHtmlElement.classList.add("ContextMenu");
 
 	var oList = document.createElement("ul");
 	oHtmlElement.appendChild(oList);
@@ -291,6 +267,7 @@ CVisualContextMenu.prototype.UpdatePopupPosition = function(oPopup)
 	var nHeight = this.m_nHeight;
 	if (null !== this.m_nMaxHeight && nHeight > this.m_nMaxHeight)
 	{
+		console.log(this.m_nMaxHeight);
 		nHeight = this.m_nMaxHeight;
 	}
 
@@ -310,24 +287,20 @@ CVisualContextMenu.prototype.UpdatePopupPosition = function(oPopup)
 		this.m_nX = nAppWidth - nWidth;
 
 	var oHtmlElement        = this.m_oPopup.GetHtmlElement();
-	oHtmlElement.style.left = this.m_nX + "px";
-	oHtmlElement.style.top  = this.m_nY + "px";
+	//oHtmlElement.style.left = this.m_nX + "px";
+	//oHtmlElement.style.top  = this.m_nY + "px";
 };
 CVisualContextMenu.prototype.OnHidePopup = function(oPopup)
 {
 	var oHtmlElement = oPopup.GetHtmlElement();
-	oHtmlElement.style.height = "0px";
+	oHtmlElement.classList.remove("visible");
 
 	for (var nIndex = 0, nCount = this.m_arrOnHideCallbacks.length; nIndex < nCount; ++nIndex)
 	{
 		this.m_arrOnHideCallbacks[nIndex]();
 	}
 };
-CVisualContextMenu.prototype.OnPreShowPopup = function(oPopup)
-{
-	var oHtmlElement = oPopup.GetHtmlElement();
-	oHtmlElement.style.height = "0px";
-};
+
 CVisualContextMenu.prototype.OnShowPopup = function(oPopup)
 {
 	var bAddScroll = false;

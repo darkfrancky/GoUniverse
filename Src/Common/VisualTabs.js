@@ -650,16 +650,15 @@ CVisualChatRoomTab.prototype.OnClick = function()
 	var oOldTab = this.m_oParent.OnClick(this);
 	if (oOldTab)
 	{
-		oOldTab.m_oMenuSpan.style.visibility = "hidden";
-		oOldTab.m_oTabDiv.style.background   = "transparent";
-		oOldTab.m_oButton.style.color        = "rgb(0, 0, 0)";
+		oOldTab.m_oMenuSpan.classList.add("hidden");
+		oOldTab.m_oTabDiv.setAttribute("id", "");
 	}
 
 	this.m_nNewMessagesCount          = 0;
 	this.m_oMessagesDiv.innerHTML     = "";
-	this.m_oMenuSpan.style.visibility = "visible";
-	this.m_oTabDiv.style.background   = "rgb(0, 130, 114)";
-	this.m_oButton.style.color        = "rgb(255, 255, 255)";
+	this.m_oMenuSpan.classList.remove("hidden");
+
+	this.m_oTabDiv.setAttribute("id", "activeTab");
 
 	this.m_oApp.SetCurrentChatRoom(this.m_nId);
 };
@@ -693,70 +692,34 @@ CVisualChatRoomTab.prototype.private_CreatePopup = function()
 	this.m_oPopup.Create(true);
 
 	var oHtmlElement = this.m_oPopup.GetHtmlElement();
-	oHtmlElement.style.background         = "rgb(0, 130, 114)";
-	oHtmlElement.style.borderRight        = "1px solid rgb(190, 190, 190)";
-	oHtmlElement.style.borderLeft         = "1px solid rgb(190, 190, 190)";
-	oHtmlElement.style.borderBottom       = "1px solid rgb(190, 190, 190)";
-	oHtmlElement.style.boxShadow          = "0px 1px 2px rgba(0,0,0,0.2)";
-	oHtmlElement.style.transitionProperty = "height";
-	oHtmlElement.style.transitionDuration = "0.2s";
-	oHtmlElement.style.transitionDelay    = "0s";
+	oHtmlElement.classList.add("chatMenuPopup");
 	this.private_InitMenu();
 };
 CVisualChatRoomTab.prototype.OnHidePopup = function(oPopup)
 {
 	var oHtmlElement = oPopup.GetHtmlElement();
-	oHtmlElement.style.height = "0px";
+	oHtmlElement.classList.remove("visible");
+
 
 	this.m_oPopup = null;
 
-	this.m_oMenuSpan.style.transform  = "rotate(90deg)";
-};
-CVisualChatRoomTab.prototype.OnPreShowPopup = function(oPopup)
-{
-	var oHtmlElement = oPopup.GetHtmlElement();
-	oHtmlElement.style.height = "0px";
-
-	this.m_oMenuSpan.style.transform  = "rotate(90deg)";
+	this.m_oMenuSpan.classList.remove("rotate");
 };
 CVisualChatRoomTab.prototype.OnShowPopup = function(oPopup)
 {
-	var oHtmlElement = oPopup.GetHtmlElement();
-	oHtmlElement.style.height = "30px";
-	this.m_oMenuSpan.style.transform = "rotate(270deg)";
+	this.m_oMenuSpan.classList.add("rotate");
 };
-CVisualChatRoomTab.prototype.UpdatePopupPosition = function(oPopup)
-{
-	var nScrollOffset = this.m_oTabDiv.parentNode.scrollTop;
-	var oPos = Common_FindPosition(this.m_oTabDiv);
-	var oHtmlElement = oPopup.GetHtmlElement();
-	oHtmlElement.style.left = (oPos.X - 1) + "px";
-	oHtmlElement.style.top = (oPos.Y + 24 - nScrollOffset) + "px";
-	oHtmlElement.style.width = this.m_oTabDiv.clientWidth;
-};
+
 CVisualChatRoomTab.prototype.private_InitTab = function(sRoomName)
 {
 	var oThis      = this;
 	this.m_oTabDiv = document.createElement("div");
-	var sHeight    = "24px";
 
 	var DivTab                      = this.m_oTabDiv;
-	DivTab.style.overflow           = "visible";
-	DivTab.style.position           = "relative";
+	DivTab.classList.add("chatRoomTab");
 	DivTab["aria-label"]            = sRoomName;
 	DivTab.title                    = sRoomName;
-	DivTab.style.transitionProperty = "width,height,background,margin,border";
-	DivTab.style.transitionDuration = ".3s";
-	DivTab.style.float              = "left";
-	DivTab.style.height             = sHeight;
-	DivTab.style.minWidth           = "200px";
-	DivTab.style.margin             = "0px";
-	DivTab.style.padding            = "0px";
-	DivTab.style.color              = "#000";
-	DivTab.style.whiteSpace         = "nowrap";
-	DivTab.style.textOverflow       = "ellipsis";
-	DivTab.style.borderBottom       = "1px solid #BEBEBE";
-	DivTab.style.cursor             = "pointer";
+
 	DivTab.addEventListener("selectstart", function()
 	{
 		return false;
@@ -767,45 +730,23 @@ CVisualChatRoomTab.prototype.private_InitTab = function(sRoomName)
 	});
 
 	var NewTab                             = document.createElement("button");
-	NewTab.tabIndex                        = "0";
-	NewTab.style.transitionProperty        = "all";
-	NewTab.style.transitionDuration        = ".25s";
-	NewTab.style.background                = "none";
-	NewTab.style.outline                   = "none";
-	NewTab.style.cursor                    = "pointer";
-	NewTab.style["-webkit-appearance"]     = "none";
-	NewTab.style["-webkit-border-radius"]  = "0";
-	NewTab.style.overflow                  = "visible";
-	NewTab.style.fontFamily                = '"Segoe UI",Helvetica,Tahoma,Geneva,Verdana,sans-serif';
-	NewTab.style["-webkit-font-smoothing"] = "antialiased";
-	NewTab.style.padding                   = "0px";
-	NewTab.style.border                    = "1px solid transparent";
-	NewTab.style.boxSizing                 = "border-box";
-	NewTab.style.fontSize                  = "14px";
-	NewTab.style.lineHeight                = "20px";
-	NewTab.style.height                    = "100%";
-	NewTab.style.margin                    = "0px";
-	NewTab.style.padding                   = "0px 0px 0px 14px";
-	NewTab.style.maxWidth                  = "174px";
-	NewTab.style.overflow                  = "hidden";
-	NewTab.style.float                     = "left";
+	NewTab.classList.add("tabNameBtn");
+	NewTab.classList.add("btn");
 
 	var NewTabDiv = document.createElement("div");
-	NewTabDiv.style.textAlign = "left";
+	NewTabDiv.classList.add("tabLabel");
+
 	var oCaptionDiv = document.createElement("div");
 
 	if(true == this.m_bMessageChat)
 	{
-		oCaptionDiv.style.fontWeight = "bold";
-		oCaptionDiv.style.fontStyle = "italic";
+		NewTabDiv.classList.add("messages");
 	}
 	else if (true === this.m_bPrivateChat)
 	{
-		oCaptionDiv.style.fontWeight = "bold";
+		NewTabDiv.classList.add("private");
 	}
-	oCaptionDiv.style.textOverflow = "ellipsis";
-	oCaptionDiv.innerHTML = sRoomName;
-	NewTabDiv.appendChild(oCaptionDiv);
+	NewTabDiv.innerHTML = sRoomName;
 	NewTabDiv.addEventListener("selectstart", function()
 	{
 		return false;
@@ -821,26 +762,20 @@ CVisualChatRoomTab.prototype.private_InitMenuButton = function()
 {
 	var oThis            = this;
 	var oMenuButton      = document.createElement("button");
-	oMenuButton.tabIndex = "0";
-	oMenuButton.className += " ChatMenuButton";
-	oMenuButton.style["float"] = "right";
+	oMenuButton.classList.add("chatBtn");
+	oMenuButton.classList.add("btn");
 
-	var oCenter    = document.createElement("center");
-	var oCenterDiv = document.createElement("div");
-	var oMenuSpan  = document.createElement("span");
+	var menuDiv = document.createElement("div");
+	var menuSpan  = document.createElement("span");
 
-	oMenuSpan.style.visibility = "hidden";
-	oMenuSpan.className += " ChatMenuSpan";
-	oCenterDiv.appendChild(oMenuSpan);
+	menuSpan.classList.add("chatMenu");
+	menuDiv.appendChild(menuSpan);
 
-	var oMessagesSpan              = document.createElement("span");
-	oMessagesSpan.style.fontSize   = "12px";
-	oMessagesSpan.style.lineHeight = "18px";
-	oMessagesSpan.style.color      = "#008272";
-	oMessagesSpan.innerHTML        = "";
-	oCenterDiv.appendChild(oMessagesSpan);
-	oCenter.appendChild(oCenterDiv);
-	oMenuButton.appendChild(oCenter);
+	var messagesSpan = document.createElement("span");
+	messagesSpan.classList.add("chatMsgCount");
+	oMenuButton.appendChild(messagesSpan);
+
+	oMenuButton.appendChild(menuDiv);
 	this.m_oTabDiv.appendChild(oMenuButton);
 
 	oMenuButton.addEventListener("click", function()
@@ -858,65 +793,56 @@ CVisualChatRoomTab.prototype.private_InitMenuButton = function()
 			}
 		}
 		else
-		{
 			oThis.OnClick();
-		}
 	});
 
-	this.m_oMessagesDiv = oMessagesSpan;
-	this.m_oMenuSpan    = oMenuSpan;
+	this.m_oMessagesDiv = messagesSpan;
+	this.m_oMenuSpan    = menuSpan;
 
-	this.m_oMenuSpan.style.transform  = "rotate(90deg)";
-	this.m_oMenuSpan.style.transition = "all 0.3s ease";
 };
 CVisualChatRoomTab.prototype.private_InitMenu = function()
 {
 	var oThis = this;
 
 	var oHtmlElement = this.m_oPopup.GetHtmlElement();
-	this.private_AddMenuButton(oHtmlElement, "right", "ChatMenuSpanClose",  function()
+	this.private_AddMenuButton(oHtmlElement, "right", ["close"],  function()
 	{
 		oThis.OnClickClose();
 	}, g_oLocalization.mainRoom.roomsTabs.hint.close);
-	this.private_AddMenuButton(oHtmlElement, "left", "ChatMenuSpanLeftArrow",  function()
+	this.private_AddMenuButton(oHtmlElement, "left", ["leftArrow"],  function()
 	{
 		oThis.MoveTabToStart();
 	}, g_oLocalization.mainRoom.roomsTabs.hint.moveTabToStart);
-	this.private_AddMenuButton(oHtmlElement, "left", "ChatMenuSpanInfo",  function()
+	this.private_AddMenuButton(oHtmlElement, "left", ["info"],  function()
 	{
 		oThis.ShowRoomInfo();
 	}, oThis.IsPrivate() ? g_oLocalization.mainRoom.roomsTabs.hint.userInfo : g_oLocalization.mainRoom.roomsTabs.hint.roomInfo);
 
-	this.m_oMenuSoundButton = this.private_AddMenuButton(oHtmlElement, "left", this.IsSoundOn() ? "ChatMenuSpanSoundOn" : "ChatMenuSpanSoundOff" ,  function()
+	this.m_oMenuSoundButton = this.private_AddMenuButton(oHtmlElement, "left", this.IsSoundOn() ? ["sound"] : ["sound", "off"] ,  function()
 	{
 		oThis.OnToggleSound();
 	}, this.IsSoundOn() ? g_oLocalization.mainRoom.roomsTabs.hint.soundOn : g_oLocalization.mainRoom.roomsTabs.hint.soundOff);
 };
-CVisualChatRoomTab.prototype.private_AddMenuButton = function(oParentElement, sFloat, sSpanClass, fOnClickHandler, sHint)
+CVisualChatRoomTab.prototype.private_AddMenuButton = function(parent, align, iconClasses, onClickHandler, hint)
 {
 	var oButton      = document.createElement("button");
-	oButton.tabIndex = "0";
-	oButton.className = "ChatMenuButton";
-	oButton.style["float"] = sFloat;
+	oButton.classList.add("chatBtn");
+	oButton.classList.add("btn");
 
-	if (sHint)
+	oButton.classList.add(...iconClasses);
+	oButton.classList.add(align);
+
+	if (hint)
 	{
-		oButton["aria-label"] = sHint;
-		oButton.title         = sHint;
+		oButton["aria-label"] = hint;
+		oButton.title         = hint;
 	}
 
-	var oCenter    = document.createElement("center");
-	var oCenterDiv = document.createElement("div");
-	var oSpan  = document.createElement("span");
-	oSpan.className = sSpanClass;
-	oCenterDiv.appendChild(oSpan);
-	oCenter.appendChild(oCenterDiv);
-	oButton.appendChild(oCenter);
-	oParentElement.appendChild(oButton);
+	parent.appendChild(oButton);
 
-	oButton.addEventListener("click", fOnClickHandler, false);
+	oButton.addEventListener("click", onClickHandler, false);
 
-	return {Button : oButton, Span : oSpan};
+	return oButton;
 };
 CVisualChatRoomTab.prototype.ShowRoomInfo = function()
 {
@@ -946,49 +872,40 @@ CVisualChatRoomTab.prototype.OnToggleSound = function()
 	if (!this.m_oMenuSoundButton)
 		return;
 
-	var sHint, sSpanClass;
-	if (true === this.m_bSound)
+	var sHint;
+	if (this.m_bSound)
 	{
 		this.m_bSound = false;
-
-		sHint      = "Sound is off";
-		sSpanClass = "ChatMenuSpanSoundOff";
+		sHint = "Sound is off";
 	}
 	else
 	{
 		this.m_bSound = true;
-
-		sHint      = "Sound is on";
-		sSpanClass = "ChatMenuSpanSoundOn";
+		sHint = "Sound is on";
 	}
 
-	this.m_oMenuSoundButton.Button["aria-label"] = sHint;
-	this.m_oMenuSoundButton.Button.title         = sHint;
+	this.m_oMenuSoundButton["aria-label"] = sHint;
+	this.m_oMenuSoundButton.title         = sHint;
 
-	this.m_oMenuSoundButton.Span.className = sSpanClass;
+	if (this.m_bSound)
+		this.m_oMenuSoundButton.classList.add("off");
+	else
+		this.m_oMenuSoundButton.classList.remove("off");
 };
 CVisualChatRoomTab.prototype.ShowTab = function()
 {
-	this.m_oTabDiv.style.display = "block";
+	this.m_oTabDiv.classList.remove("hidden");
 };
 CVisualChatRoomTab.prototype.HideTab = function()
 {
-	this.m_oTabDiv.style.display = "none";
+	this.m_oTabDiv.classList.add("hidden");
 };
-CVisualChatRoomTab.prototype.OnScrollShowHide = function(isShow)
+CVisualChatRoomTab.prototype.OnScrollShowHide = function(show)
 {
-	if (isShow)
-	{
-		this.m_oTabDiv.style.minWidth     = "185px";
-		this.m_oTabDiv.style.paddingRight = "15px";
-		this.m_oButton.style.maxWidth     = "159px";
-	}
+	if(show)
+		this.m_oTabDiv.classList.add("scroll");
 	else
-	{
-		this.m_oTabDiv.style.minWidth     = "200px";
-		this.m_oTabDiv.style.paddingRight = "0px";
-		this.m_oButton.style.maxWidth     = "174px";
-	}
+		this.m_oTabDiv.classList.remove("scroll");
 };
 
 function CVisualGamesListTab(oApp)
